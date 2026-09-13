@@ -1,0 +1,28 @@
+<section class="page repairs">
+  <header class="page-header">
+    {% if logo %}<img src="{{ logo }}" class="logo" alt="Fernwater">{% endif %}
+    <span class="crumb">Repairs Needed</span>
+  </header>
+  <h1>Repairs Needed</h1>
+  <p class="sub">Every flagged item, sorted by priority — highest first.</p>
+
+  <table class="repairs-table">
+    <thead>
+      <tr><th>Priority</th><th>Unit</th><th>Item</th><th>Action</th><th>Detail</th></tr>
+    </thead>
+    <tbody>
+    {% for unit, f in repairs %}
+      <tr>
+        <td><span class="priority-pill {{ f.priority|lower }}">{{ f.priority }}</span></td>
+        <td>{{ unit.number }}</td>
+        <td>{{ f.category }}</td>
+        <td>{{ f.action }}</td>
+        <td>{{ f.narrative or f.tech_note }}</td>
+      </tr>
+    {% endfor %}
+    {% if not repairs %}
+      <tr><td colspan="5" style="text-align:center; color: var(--gray); font-style: italic; padding: 14pt;">No repairs flagged — property is in solid shape.</td></tr>
+    {% endif %}
+    </tbody>
+  </table>
+</section>

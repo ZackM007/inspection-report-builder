@@ -1,0 +1,39 @@
+<section class="page cover">
+  <main class="cover-main">
+    {% if logo %}<img src="{{ logo }}" class="cover-logo" alt="Fernwater Residential">{% endif %}
+    <h1 class="cover-title">Annual Inspection Report</h1>
+    <p class="cover-address">{{ property.address }}</p>
+    <p class="cover-date">
+      {% if property.report_date %}{{ property.report_date.strftime('%B %Y') }}
+      {% elif property.period %}{{ property.period }}{% endif %}
+    </p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Units</div><div class="kpi-value">{{ property.kpis.units_total }}</div></div>
+      <div class="kpi"><div class="kpi-label">Action Req'd</div><div class="kpi-value">{{ property.kpis.action_required }}</div></div>
+      <div class="kpi"><div class="kpi-label">No Action</div><div class="kpi-value">{{ property.kpis.no_action }}</div></div>
+      {% if property.kpis.not_inspected %}
+      <div class="kpi"><div class="kpi-label">Not Inspected</div><div class="kpi-value">{{ property.kpis.not_inspected }}</div></div>
+      {% endif %}
+      <div class="kpi"><div class="kpi-label">Work Orders</div><div class="kpi-value">{{ property.kpis.work_orders }}</div></div>
+    </div>
+  </main>
+  <footer class="cover-footer">
+    <div class="cover-footer-row">
+      <div><span class="label">Inspector</span><span class="value">{{ property.inspector or '—' }}</span></div>
+      <div><span class="label">Certification #</span><span class="value">{{ property.cert_id or '—' }}</span></div>
+      {% if property.manager %}<div><span class="label">Manager</span><span class="value">{{ property.manager }}</span></div>{% endif %}
+      {% if property.rps %}<div><span class="label">Regional Property Supervisor</span><span class="value">{{ property.rps }}</span></div>{% endif %}
+      <div><span class="label">Period</span><span class="value">
+        {% if property.period %}{{ property.period }}
+        {% elif property.report_date %}{{ property.report_date.strftime('%B %Y') }}
+        {% else %}—{% endif %}
+      </span></div>
+      <div><span class="label">Report Date</span><span class="value">
+        {% if property.report_date %}{{ property.report_date.strftime('%B %d, %Y') }}{% else %}—{% endif %}
+      </span></div>
+    </div>
+    <div class="cover-company">
+      Fernwater Residential · 1400 Alderpath Avenue, Torrance, CA 90503 · (310) 555-0142 · fernwaterresidential.example
+    </div>
+  </footer>
+</section>

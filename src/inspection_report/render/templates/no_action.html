@@ -1,0 +1,21 @@
+{% if no_action_unit_numbers %}
+<div class="no-action">
+  <h2>Units with No Action Required</h2>
+  <p>The following units passed inspection with no repair or replacement items flagged.</p>
+  <ul>
+    {% for n in no_action_unit_numbers %}<li>Unit {{ n }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if not_inspected_units %}
+<div class="no-action not-inspected">
+  <h2>Units Not Inspected</h2>
+  <p>The following units could not be inspected during this visit. Fernwater will schedule a follow-up where access becomes available.</p>
+  <ul>
+    {% for u in not_inspected_units %}
+    <li><strong>Unit {{ u.number }}</strong> — {{ u.not_inspected_reason }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}

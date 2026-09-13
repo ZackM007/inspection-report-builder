@@ -1,0 +1,22 @@
+<section class="page cert-appendix">
+  <header class="page-header">
+    {% if logo %}<img src="{{ logo }}" class="logo" alt="Fernwater">{% endif %}
+    <span class="crumb">Appendix — Inspector Certification</span>
+  </header>
+  <h1>Inspector Certification</h1>
+  <p class="sub">Proof of certification for inspectors who contributed to this report.</p>
+
+  {% for insp in cert_inspectors %}
+  <div class="cert-card">
+    <div class="row">
+      <div><span class="label">Inspector</span><br><span class="value">{{ insp.display_name }}</span></div>
+      <div><span class="label">Certification #</span><br><span class="value">{{ insp.certification_number }}</span></div>
+    </div>
+    {% if insp.cert_image_rel %}
+      <img src="{{ insp.cert_image_rel }}" alt="Certification for {{ insp.display_name }}">
+    {% else %}
+      <p style="color: var(--gray); font-style: italic;">Certification image not available.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>

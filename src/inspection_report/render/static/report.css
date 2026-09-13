@@ -1,0 +1,589 @@
+/* Fernwater Inspection Report — single source of truth for visual styling.
+   Brand colors, fonts, and layout. Used by every page type. */
+
+:root {
+  --brand-primary:  #1F4E46;
+  --brand-light: #6FA69B;
+  --brand-mid:   #3E7A6E;
+  --brand-accent:  #C2703D;
+  --slate:      #232222;
+  --gray:       #99999A;
+  --gray-soft:  #E8E8EA;
+  --white:      #FFFFFF;
+}
+
+/* --- Fonts (resolved relative to base_url = work_dir) --- */
+@font-face { font-family: 'Ubuntu'; font-weight: 300; src: url('fonts/Ubuntu-Light.ttf') format('truetype'); }
+@font-face { font-family: 'Ubuntu'; font-weight: 400; src: url('fonts/Ubuntu-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Ubuntu'; font-weight: 500; src: url('fonts/Ubuntu-Medium.ttf') format('truetype'); }
+@font-face { font-family: 'Ubuntu'; font-weight: 700; src: url('fonts/Ubuntu-Bold.ttf') format('truetype'); }
+@font-face { font-family: 'Merriweather'; font-weight: 400; font-style: italic; src: url('fonts/Merriweather-Italic.ttf') format('truetype'); }
+
+@page {
+  size: Letter;
+  margin: 0.5in 0.6in;
+}
+
+html, body {
+  font-family: 'Ubuntu', 'Segoe UI', Arial, sans-serif;
+  font-weight: 400;
+  color: var(--slate);
+  margin: 0;
+  padding: 0;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+
+.page {
+  page-break-after: always;
+  break-after: page;
+  position: relative;
+  min-height: 9.5in;
+}
+.page:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
+/* --- Shared interior page header --- */
+.page-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--gray-soft);
+  padding-bottom: 8pt;
+  margin-bottom: 18pt;
+}
+.page-header .logo { height: 32pt; }
+.page-header .crumb {
+  margin-left: auto;
+  color: var(--gray);
+  font-size: 9pt;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* --- Cover (no blue band, centered classic layout) --- */
+.cover {
+  margin: -0.5in -0.6in;
+  padding: 0.6in 0.8in 0;
+  height: 11in;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.cover-main {
+  flex-grow: 1;
+  text-align: center;
+  padding-top: 0.3in;
+}
+.cover-logo {
+  height: 80pt;
+  margin-bottom: 22pt;
+}
+.cover-title {
+  font-size: 20pt;
+  font-weight: 700;
+  margin: 0 0 6pt;
+  color: var(--brand-primary);
+  letter-spacing: -0.01em;
+}
+.cover-address {
+  font-size: 13pt;
+  font-weight: 400;
+  color: var(--slate);
+  margin: 0 0 4pt;
+}
+.cover-date {
+  color: var(--gray);
+  margin-bottom: 28pt;
+  font-size: 11pt;
+}
+
+.kpi-row {
+  display: flex;
+  justify-content: center;
+  gap: 8pt;
+  margin: 18pt 0;
+}
+.kpi {
+  flex: 1;
+  max-width: 130pt;
+  background: var(--brand-primary);
+  color: var(--white);
+  border-radius: 8pt;
+  padding: 10pt 6pt;
+  text-align: center;
+}
+.kpi .kpi-label {
+  font-size: 9pt;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+.kpi .kpi-value {
+  font-size: 22pt;
+  font-weight: 700;
+  margin-top: 2pt;
+  line-height: 1;
+}
+
+.cover-footer {
+  background: var(--slate);
+  color: var(--white);
+  padding: 14pt 0.8in;
+  margin: auto -0.8in 0;
+  break-inside: avoid;
+}
+.cover-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 9pt;
+  row-gap: 10pt;
+}
+.cover-footer-row > div {
+  flex: 1 1 33%;        /* up to 3 per row; 4–6 fields wrap to a tidy second row */
+  box-sizing: border-box;
+  padding-right: 10pt;
+}
+.cover-footer-row .label {
+  display: block;
+  color: var(--gray);
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2pt;
+}
+.cover-footer-row .value { font-weight: 500; }
+.cover-company {
+  text-align: center;
+  margin-top: 12pt;
+  padding-top: 10pt;
+  border-top: 1px solid rgba(255,255,255,0.18);
+  font-size: 8.5pt;
+  color: var(--gray);
+}
+
+/* --- Summary page (executive summary) --- */
+.summary h1 {
+  font-size: 22pt;
+  font-weight: 700;
+  margin: 0 0 4pt;
+  color: var(--slate);
+  letter-spacing: -0.01em;
+}
+.summary .sub {
+  color: var(--gray);
+  margin-bottom: 12pt;
+  font-size: 10.5pt;
+}
+
+/* KPI tiles with colored top accents */
+.summary .kpi-row { margin: 0 0 11pt; gap: 8pt; }
+.summary .kpi {
+  background: var(--white);
+  color: var(--slate);
+  border: 1px solid var(--gray-soft);
+  border-top: 3pt solid var(--brand-primary);
+  border-radius: 6pt;
+  max-width: none;
+  padding: 7pt 8pt;
+  text-align: left;
+}
+.summary .kpi.accent-blue  { border-top-color: var(--brand-primary); }
+.summary .kpi.accent-slate { border-top-color: var(--slate); }
+.summary .kpi.accent-gray  { border-top-color: var(--gray); }
+.summary .kpi .kpi-label {
+  color: var(--gray);
+  font-size: 7.5pt;
+  letter-spacing: 0.06em;
+}
+.summary .kpi .kpi-value { color: var(--brand-primary); font-size: 22pt; }
+.summary .kpi.accent-slate .kpi-value { color: var(--slate); }
+.summary .kpi.accent-gray .kpi-value { color: var(--gray); }
+
+/* Two-column card row: issues + unit status */
+.summary-cards {
+  display: flex;
+  gap: 12pt;
+  margin-bottom: 11pt;
+}
+.card {
+  border: 1px solid var(--gray-soft);
+  border-radius: 8pt;
+  padding: 10pt 12pt;
+  break-inside: avoid;
+}
+.card h3 {
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 0 0 1pt;
+  color: var(--slate);
+}
+.card .card-sub {
+  color: var(--gray);
+  font-size: 9pt;
+  margin: 0 0 9pt;
+}
+.issues-card { flex: 1.25; background: var(--white); }
+.status-card { flex: 1; background: #F1F5FB; }
+
+/* Horizontal bar chart */
+.hbar-chart { display: flex; flex-direction: column; gap: 6pt; }
+.hbar-row { display: flex; align-items: center; font-size: 9.5pt; }
+.hbar-label { width: 92pt; color: var(--slate); flex-shrink: 0; }
+.hbar-track {
+  flex: 1;
+  height: 9pt;
+  background: var(--gray-soft);
+  border-radius: 5pt;
+  overflow: hidden;
+}
+.hbar-fill { display: block; height: 100%; border-radius: 5pt; }
+.hbar-count { width: 22pt; text-align: right; font-weight: 700; color: var(--slate); flex-shrink: 0; }
+
+/* Unit status card */
+.status-headline { text-align: center; margin: 2pt 0 9pt; }
+.status-big {
+  display: block;
+  font-size: 26pt;
+  font-weight: 700;
+  color: var(--brand-primary);
+  line-height: 1.1;
+}
+.status-sub { color: var(--gray); font-size: 10pt; }
+.status-bar {
+  height: 11pt;
+  background: var(--gray-soft);
+  border-radius: 6pt;
+  overflow: hidden;
+  margin-bottom: 10pt;
+}
+.status-bar-fill { display: block; height: 100%; background: var(--brand-primary); border-radius: 6pt; }
+.status-legend { display: flex; flex-direction: column; gap: 4pt; }
+.legend-row { display: flex; align-items: center; font-size: 10pt; color: var(--slate); }
+.legend-row .dot { width: 8pt; height: 8pt; border-radius: 50%; margin-right: 7pt; flex-shrink: 0; }
+.legend-row .legend-num { margin-left: auto; font-weight: 700; }
+.dot-blue { background: var(--brand-primary); }
+.dot-gray { background: var(--gray); }
+.dot-slate { background: var(--slate); }
+
+/* Immediate attention priorities */
+.attention-priorities {
+  border: 1px solid var(--gray-soft);
+  border-left: 4pt solid var(--brand-accent);
+  border-radius: 0 8pt 8pt 0;
+  padding: 10pt 14pt;
+}
+.attention-priorities h3 {
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 0 0 1pt;
+  color: var(--slate);
+}
+.attention-priorities .card-sub { color: var(--gray); font-size: 9pt; margin: 0 0 9pt; }
+.attn-row {
+  display: flex;
+  align-items: center;
+  gap: 10pt;
+  padding: 4pt 0;
+  border-top: 1px solid var(--gray-soft);
+  break-inside: avoid;
+}
+.attn-row:first-of-type { border-top: none; }
+.attn-badge {
+  width: 20pt;
+  height: 20pt;
+  border-radius: 50%;
+  color: var(--white);
+  font-weight: 700;
+  font-size: 9.5pt;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.attn-body { flex: 1; }
+.attn-label { font-weight: 700; font-size: 10.5pt; color: var(--slate); }
+.attn-units { color: var(--gray); font-size: 9pt; }
+.attn-overflow { color: var(--gray); font-size: 8.5pt; font-style: italic; }
+
+/* --- Unit page --- */
+
+/* Wrap unit content in a table so the page-header in <thead> repeats
+   on every continuation page when a unit spans multiple printed pages.
+   This is the only reliable cross-page-header technique Chromium supports. */
+.unit-page {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.unit-page > thead { display: table-header-group; }
+.unit-page > tbody { display: table-row-group; }
+.unit-page > thead > tr > td,
+.unit-page > tbody > tr > td {
+  padding: 0;
+  border: none;
+  vertical-align: top;
+}
+.unit-page > thead .page-header {
+  /* thead repeats per page — give it bottom space so body content
+     doesn't crash into it after a page break */
+  margin-bottom: 18pt;
+}
+
+.unit-header { margin-bottom: 18pt; }
+.unit-title h2 {
+  font-size: 20pt;
+  font-weight: 700;
+  margin: 0;
+  color: var(--slate);
+}
+.unit-title .meta {
+  color: var(--gray);
+  font-size: 10pt;
+  margin-top: 3pt;
+}
+
+.findings { margin: 8pt 0 0; }
+.finding {
+  padding: 8pt 0;
+  border-bottom: 1px solid var(--gray-soft);
+  break-inside: avoid;
+}
+.finding:last-child { border-bottom: none; }
+.finding .head {
+  display: flex;
+  align-items: center;
+  gap: 8pt;
+  font-weight: 500;
+  font-size: 12pt;
+  margin-bottom: 4pt;
+}
+.finding .dot {
+  width: 9pt;
+  height: 9pt;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--gray);
+}
+.finding .action {
+  font-weight: 400;
+  color: var(--gray);
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 4pt;
+}
+.finding .narrative {
+  margin: 4pt 0 8pt;
+  color: var(--slate);
+  font-size: 11pt;
+}
+
+.finding-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5pt;
+  margin-top: 4pt;
+}
+.finding-photo-grid img {
+  width: 100%;
+  height: 88pt;
+  object-fit: contain;
+  background: var(--gray-soft);
+  border: 1pt solid var(--gray-soft);
+  border-radius: 3pt;
+  image-rendering: auto;
+}
+.finding-photo-grid.placeholder {
+  display: block;
+  background: var(--gray-soft);
+  color: var(--gray);
+  text-align: center;
+  padding: 22pt;
+  font-size: 9pt;
+  border-radius: 3pt;
+}
+
+.supplemental {
+  margin-top: 18pt;
+  break-inside: avoid;
+}
+.supplemental h3 {
+  font-size: 10pt;
+  font-weight: 500;
+  color: var(--slate);
+  margin: 0 0 6pt;
+  letter-spacing: 0.02em;
+}
+.supplemental-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);   /* 4-col so each cell sits closer to native px */
+  gap: 6pt;
+}
+.supplemental-grid img {
+  width: 100%;
+  height: 95pt;
+  object-fit: contain;
+  background: var(--gray-soft);
+  border: 1pt solid var(--gray-soft);
+  border-radius: 3pt;
+}
+
+/* --- Repairs page --- */
+.repairs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14pt;
+}
+.repairs-table thead {
+  background: var(--brand-primary);
+  color: var(--white);
+}
+.repairs-table th, .repairs-table td {
+  text-align: left;
+  padding: 7pt 10pt;
+  font-size: 10pt;
+  vertical-align: top;
+}
+.repairs-table th {
+  font-weight: 500;
+  font-size: 9pt;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.repairs-table tbody tr:nth-child(even) { background: var(--gray-soft); }
+.priority-pill {
+  display: inline-block;
+  padding: 2pt 9pt;
+  border-radius: 12pt;
+  font-size: 8.5pt;
+  font-weight: 700;
+  color: var(--white);
+}
+.priority-pill.high { background: var(--brand-primary); }
+.priority-pill.medium { background: var(--brand-light); }
+.priority-pill.low { background: var(--gray); }
+
+/* --- No Action Required summary (appendix block) --- */
+.no-action {
+  margin-top: 14pt;
+  padding: 14pt 18pt;
+  background: var(--gray-soft);
+  border-radius: 6pt;
+}
+.no-action h2 {
+  font-size: 14pt;
+  font-weight: 500;
+  margin: 0 0 6pt;
+  color: var(--slate);
+}
+.no-action p { color: var(--gray); margin: 0 0 8pt; font-size: 10pt; }
+.no-action ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4pt 14pt;
+}
+.no-action li {
+  font-size: 11pt;
+  font-weight: 500;
+  color: var(--slate);
+}
+.no-action.not-inspected ul {
+  grid-template-columns: 1fr;   /* reasons are full sentences — one per row */
+}
+.no-action.not-inspected li {
+  font-weight: 400;
+  font-size: 10.5pt;
+}
+
+/* --- Unit header inspector note --- */
+.overall-note {
+  margin-top: 3pt;
+  font-size: 9.5pt;
+  font-style: italic;
+  color: var(--gray);
+}
+
+/* --- Next steps page --- */
+.next-steps h1 {
+  font-size: 22pt;
+  font-weight: 700;
+  margin: 0 0 4pt;
+}
+.next-steps .sub {
+  color: var(--gray);
+  margin-bottom: 18pt;
+}
+.next-steps ul { padding-left: 18pt; }
+.next-steps li { margin-bottom: 10pt; font-size: 11pt; }
+.next-steps li strong { color: var(--brand-primary); }
+
+/* --- Property inspection disclaimer (bottom of Next Steps) --- */
+.disclaimer {
+  margin-top: 28pt;
+  padding: 12pt 16pt;
+  background: var(--gray-soft);
+  border-top: 3pt solid var(--brand-accent);
+  border-radius: 0 0 6pt 6pt;
+  break-inside: avoid;
+}
+.disclaimer h3 {
+  margin: 0 0 6pt;
+  font-size: 9.5pt;
+  font-weight: 700;
+  letter-spacing: 0.4pt;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.disclaimer p {
+  margin: 0;
+  font-size: 8.5pt;
+  line-height: 1.5;
+  color: var(--gray);
+  text-align: justify;
+}
+
+/* --- Cert appendix --- */
+.cert-appendix h1 {
+  font-size: 20pt;
+  font-weight: 700;
+  margin: 0 0 4pt;
+}
+.cert-appendix .sub {
+  color: var(--gray);
+  margin-bottom: 18pt;
+  font-size: 11pt;
+}
+.cert-card {
+  border: 1px solid var(--gray-soft);
+  border-radius: 6pt;
+  padding: 14pt;
+  margin-bottom: 14pt;
+  break-inside: avoid;
+}
+.cert-card .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8pt;
+}
+.cert-card .label {
+  color: var(--gray);
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cert-card .value { font-weight: 500; }
+.cert-card img {
+  width: 100%;
+  max-height: 7.5in;
+  object-fit: contain;
+  background: var(--white);
+  border: 1px solid var(--gray-soft);
+  border-radius: 3pt;
+}

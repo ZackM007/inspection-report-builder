@@ -1,0 +1,73 @@
+<section class="page summary">
+  <header class="page-header">
+    {% if logo %}<img src="{{ logo }}" class="logo" alt="Fernwater">{% endif %}
+    <span class="crumb">Summary</span>
+  </header>
+
+  <h1>Property Inspection Summary</h1>
+  <p class="sub">
+    {{ property.address }}
+    {% if property.inspector %} &nbsp;|&nbsp; Inspector: {{ property.inspector }}{% endif %}
+    {% if property.report_date %} &nbsp;|&nbsp; {{ property.report_date.strftime('%B %Y') }}{% endif %}
+  </p>
+
+  <div class="kpi-row">
+    <div class="kpi accent-blue"><div class="kpi-label">Units</div><div class="kpi-value">{{ property.kpis.units_total }}</div></div>
+    <div class="kpi accent-blue"><div class="kpi-label">Action Required</div><div class="kpi-value">{{ property.kpis.action_required }}</div></div>
+    <div class="kpi accent-slate"><div class="kpi-label">No Action</div><div class="kpi-value">{{ property.kpis.no_action }}</div></div>
+    <div class="kpi accent-gray"><div class="kpi-label">Not Inspected</div><div class="kpi-value">{{ property.kpis.not_inspected }}</div></div>
+    <div class="kpi accent-blue"><div class="kpi-label">Work Orders</div><div class="kpi-value">{{ property.kpis.work_orders }}</div></div>
+  </div>
+
+  <div class="summary-cards">
+    <div class="card issues-card">
+      <h3>Most common issues</h3>
+      <p class="card-sub">Count of findings by category</p>
+      <div class="hbar-chart">
+        {% for category, count in chart_issues %}
+        <div class="hbar-row">
+          <span class="hbar-label">{{ category }}</span>
+          <span class="hbar-track">
+            <span class="hbar-fill" style="width: {{ (count / common_issues_max * 100)|round(1) }}%; background: {{ category_color(category) }};"></span>
+          </span>
+          <span class="hbar-count">{{ count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card status-card">
+      <h3>Unit status</h3>
+      <div class="status-headline">
+        <span class="status-big">{{ property.kpis.action_required }} of {{ property.kpis.units_total }}</span>
+        <span class="status-sub">units require action</span>
+      </div>
+      {% set total = property.kpis.units_total or 1 %}
+      <div class="status-bar">
+        <span class="status-bar-fill" style="width: {{ (property.kpis.action_required / total * 100)|round(1) }}%;"></span>
+      </div>
+      <div class="status-legend">
+        <div class="legend-row"><span class="dot dot-blue"></span>Action required<span class="legend-num">{{ property.kpis.action_required }}</span></div>
+        <div class="legend-row"><span class="dot dot-gray"></span>Not inspected<span class="legend-num">{{ property.kpis.not_inspected }}</span></div>
+        <div class="legend-row"><span class="dot dot-slate"></span>No action<span class="legend-num">{{ property.kpis.no_action }}</span></div>
+      </div>
+    </div>
+  </div>
+
+  {% if attention_items %}
+  <div class="attention-priorities">
+    <h3>Immediate attention priorities</h3>
+    <p class="card-sub">Priority categories from this inspection, most serious first</p>
+    {% for item in attention_items %}
+    <div class="attn-row">
+      <span class="attn-badge" style="background: {{ item.color }};">{{ item.count }}</span>
+      <div class="attn-body">
+        <div class="attn-label">{{ item.label }}</div>
+        <div class="attn-units">{{ item.unit_label }}</div>
+        {% if item.overflow_note %}<div class="attn-overflow">{{ item.overflow_note }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>

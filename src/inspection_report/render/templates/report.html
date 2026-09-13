@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ property.name }} — Annual Inspection Report</title>
+  <link rel="stylesheet" href="report.css">
+</head>
+<body>
+  {% include "cover.html" %}
+  {% include "summary.html" %}
+  {% for unit in actionable_units %}
+    {% include "unit.html" %}
+  {% endfor %}
+  {% include "repairs.html" %}
+  {% if no_action_unit_numbers or not_inspected_units %}
+  <section class="page">
+    <header class="page-header">
+      {% if logo %}<img src="{{ logo }}" class="logo" alt="Fernwater">{% endif %}
+      <span class="crumb">Unit Status</span>
+    </header>
+    {% include "no_action.html" %}
+  </section>
+  {% endif %}
+  {% include "next_steps.html" %}
+  {% if cert_inspectors %}
+    {% include "appendix.html" %}
+  {% endif %}
+</body>
+</html>

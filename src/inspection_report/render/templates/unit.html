@@ -1,0 +1,64 @@
+<section class="page unit">
+  <table class="unit-page">
+    <thead>
+      <tr><td>
+        <div class="page-header">
+          {% if logo %}<img src="{{ logo }}" class="logo" alt="Fernwater">{% endif %}
+          <span class="crumb">Unit {{ unit.number }}</span>
+        </div>
+      </td></tr>
+    </thead>
+    <tbody>
+      <tr><td>
+
+  <div class="unit-header">
+    <div class="unit-title">
+      <h2>Unit {{ unit.number }}{% if unit.type %} — {{ unit.type }}{% endif %}</h2>
+      <div class="meta">
+        {% if unit.inspected_at %}Inspected {{ unit.inspected_at.strftime('%B %d, %Y') }}{% endif %}
+        {% if unit.work_order_id %} · WO #{{ unit.work_order_id }}{% endif %}
+        {% if unit.inspector %} · {{ unit.inspector }}{% endif %}
+      </div>
+      {% if unit.overall_note %}
+      <div class="overall-note">Inspector note: {{ unit.overall_note }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% set actionable = unit.findings|selectattr('action')|list %}
+  {% if actionable %}
+  <div class="findings">
+    {% for f in actionable %}
+    <div class="finding">
+      <div class="head">
+        <span class="dot" style="background: {{ category_color(f.category) }};"></span>
+        {{ f.category }}
+        <span class="action">{{ f.action }}</span>
+      </div>
+      <p class="narrative">{{ f.narrative or f.tech_note }}</p>
+      {% if f.photos %}
+      <div class="finding-photo-grid">
+        {% for p in f.photos %}<img src="{{ p.path.as_posix() }}" alt="">{% endfor %}
+      </div>
+      {% else %}
+      <div class="finding-photo-grid placeholder">Photo not available</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% set supp = unit.photos|rejectattr('is_signature')|list %}
+  {% if supp and not actionable %}
+  <div class="supplemental">
+    <h3>Inspection photos ({{ supp|length }})</h3>
+    <div class="supplemental-grid">
+      {% for p in supp %}<img src="{{ p.path.as_posix() }}" alt="">{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+      </td></tr>
+    </tbody>
+  </table>
+</section>

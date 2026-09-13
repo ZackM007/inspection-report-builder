@@ -1,0 +1,139 @@
+{
+  "units": {
+    "03": {
+      "bottom_line": "Two items flagged, one of them a carbon monoxide alarm on a low battery.",
+      "findings": [
+        {"index": 0, "priority": "Low", "narrative": "The unit number is missing from the front door."},
+        {"index": 1, "priority": "High", "narrative": "The carbon monoxide alarm is chirping on a low battery."}
+      ]
+    },
+    "05": {
+      "bottom_line": "Two items flagged, including missing hallway smoke detectors.",
+      "findings": [
+        {"index": 0, "priority": "High", "narrative": "Smoke detectors are missing from the hallway."},
+        {"index": 1, "priority": "Low", "narrative": "Several kitchen cabinet hinges are loose."}
+      ]
+    },
+    "06": {
+      "bottom_line": "One item flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Low", "narrative": "The carpet tack strip is missing screws."}
+      ]
+    },
+    "07": {
+      "bottom_line": "Three items flagged, the largest being drywall damage in the dining room.",
+      "findings": [
+        {"index": 0, "priority": "Low", "narrative": "A kitchen drawer is damaged."},
+        {"index": 1, "priority": "Medium", "narrative": "The drywall in the dining room, behind the kitchen wall, is damaged."},
+        {"index": 2, "priority": "Medium", "narrative": "The control knob on the living room wall heater is broken."}
+      ]
+    },
+    "08": {
+      "bottom_line": "Two items flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Low", "narrative": "Several kitchen cabinet hinges are loose."},
+        {"index": 1, "priority": "Medium", "narrative": "The hallway floor is damaged."}
+      ]
+    },
+    "09": {
+      "bottom_line": "One item flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Medium", "narrative": "Floor planks are lifting in the living room."}
+      ]
+    },
+    "10": {
+      "bottom_line": "Three items flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Medium", "narrative": "The burners on the right side of the stove do not turn on."},
+        {"index": 1, "priority": "Low", "narrative": "The painted finish on the kitchen countertop is peeling."},
+        {"index": 2, "priority": "Medium", "narrative": "The control knob on the living room wall heater is broken."}
+      ]
+    },
+    "13": {
+      "bottom_line": "Two items flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Medium", "narrative": "Floor planks are lifting in the living room."},
+        {"index": 1, "priority": "Medium", "narrative": "The control knob on the living room wall heater is broken."}
+      ]
+    },
+    "14": {
+      "bottom_line": "Three items flagged, one of them a carbon monoxide alarm on a low battery.",
+      "findings": [
+        {"index": 0, "priority": "High", "narrative": "The carbon monoxide alarm is chirping on a low battery."},
+        {"index": 1, "priority": "Low", "narrative": "A kitchen drawer is damaged."},
+        {"index": 2, "priority": "Medium", "narrative": "Floor planks are lifting in the living room."}
+      ]
+    },
+    "15": {
+      "bottom_line": "One item flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Low", "narrative": "The unit number is missing from the front door."}
+      ]
+    },
+    "16": {
+      "bottom_line": "Two items flagged, both of them high priority.",
+      "findings": [
+        {"index": 0, "priority": "High", "narrative": "The carbon monoxide alarm is chirping on a low battery."},
+        {"index": 1, "priority": "High", "narrative": "The dining room ceiling fan is broken and is not secured to its mount."}
+      ]
+    },
+    "17": {
+      "bottom_line": "Two items flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Medium", "narrative": "The refrigerator door seal is torn."},
+        {"index": 1, "priority": "Medium", "narrative": "The bedroom window does not stay open on its own."}
+      ]
+    },
+    "19": {
+      "bottom_line": "One item flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Medium", "narrative": "The burners on the right side of the stove do not turn on."}
+      ]
+    },
+    "21": {
+      "bottom_line": "Five items flagged, the most significant being a blocked water heater closet.",
+      "findings": [
+        {"index": 0, "priority": "Low", "narrative": "The unit number is missing from the front door."},
+        {"index": 1, "priority": "Medium", "narrative": "The garbage disposal does not run, and the bathtub and bathroom sink are missing drain strainers."},
+        {"index": 2, "priority": "Medium", "narrative": "There is a water stain on the ceiling outside the bathroom."},
+        {"index": 3, "priority": "Low", "narrative": "The carpet tack strip is missing screws."},
+        {"index": 4, "priority": "High", "narrative": "The water heater closet is blocked by stored boxes."}
+      ]
+    },
+    "22": {
+      "bottom_line": "Five items flagged, one of them an unsecured dining room ceiling fan.",
+      "findings": [
+        {"index": 0, "priority": "Medium", "narrative": "The tub spout in the hallway bathroom is missing caulk where it meets the wall."},
+        {"index": 1, "priority": "Low", "narrative": "The kitchen window screen is damaged."},
+        {"index": 2, "priority": "High", "narrative": "The dining room ceiling fan is broken and is not secured to its mount."},
+        {"index": 3, "priority": "Low", "narrative": "The carpet tack strip is missing screws."},
+        {"index": 4, "priority": "Medium", "narrative": "The control knob on the living room wall heater is broken."}
+      ]
+    },
+    "23": {
+      "bottom_line": "One item flagged, and it is a high priority.",
+      "findings": [
+        {"index": 0, "priority": "High", "narrative": "Smoke detectors are missing throughout the unit."}
+      ]
+    },
+    "25": {
+      "bottom_line": "One item flagged for follow-up.",
+      "findings": [
+        {"index": 0, "priority": "Low", "narrative": "The bathroom sink drains slowly."}
+      ]
+    },
+    "27": {
+      "bottom_line": "Two items flagged, including missing hallway smoke detectors.",
+      "findings": [
+        {"index": 0, "priority": "High", "narrative": "Smoke detectors are missing from the hallway."},
+        {"index": 1, "priority": "Medium", "narrative": "The control knob on the living room wall heater is broken."}
+      ]
+    },
+    "28": {
+      "bottom_line": "One item flagged, and it is a high priority.",
+      "findings": [
+        {"index": 0, "priority": "High", "narrative": "The carbon monoxide alarm is chirping on a low battery."}
+      ]
+    }
+  }
+}
