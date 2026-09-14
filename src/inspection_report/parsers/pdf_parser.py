@@ -1,6 +1,6 @@
 """Parse a Yardi inspection PDF into the same Property graph as xlsx_parser.
 
-The Yardi PDF layout (verified against Prop 1058, 12 units, 112 pages):
+The Yardi PDF layout (verified against Prop 4655, 12 units, 112 pages):
   - Each unit spans ~10 pages.
   - First page of a unit contains 'Inspection ID' and the header fields
     (Inspector / Inspected Date / Property Code / Unit Code / Tenant Name /
@@ -166,7 +166,7 @@ def _parse_unit(doc, start_page: int, end_page: int, media_dir: Path) -> Unit | 
 def _extract_header_fields(lines: list[str]) -> dict[str, str]:
     """Yardi PDF puts header labels first (one per line, several in a row), then
     values (one per line, in the same order). 'Property Code' and 'Unit Code'
-    are consecutive labels with values '1058' and '101' on consecutive lines.
+    are consecutive labels with values '4655' and '101' on consecutive lines.
 
     Strategy: queue labels as we see them; pop one per value line that follows.
     """
@@ -188,12 +188,12 @@ def _extract_header_fields(lines: list[str]) -> dict[str, str]:
 
 
 def _clean_address(addr: str) -> str:
-    """'3627 Penn Mar Ave. 101 El Monte, CA - 91732 us' -> tidier form."""
+    """'820 Wrenfield Ave. 101 Torrance, CA - 90504 us' -> tidier form."""
     a = addr.strip()
     if a.lower().endswith(" us"):
         a = a[:-3].strip()
     a = a.replace(" - ", " ")
-    # Drop the unit-number token that Yardi sometimes embeds (e.g. '101 El Monte').
+    # Drop the unit-number token that Yardi sometimes embeds (e.g. '101 Torrance').
     # Heuristic: a 1-4 digit token that sits BETWEEN a street suffix and a city.
     a = re.sub(r"(Ave\.|St\.|Blvd\.|Rd\.|Dr\.|Ln\.|Way|Ct\.)\s+\d{1,4}\s+", r"\1, ", a)
     return " ".join(a.split())

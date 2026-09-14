@@ -59,7 +59,7 @@ NS = {
 UNIT_MARKER = "Inspection ID"
 FINDINGS_MARKERS = (
     "Annual Maintenace Unit Inspections",    # Analytics export (Yardi's typo, verbatim)
-    "Annual Unit Inspection - Maintenance",  # older export variant (e.g. prop 1646)
+    "Annual Unit Inspection - Maintenance",  # older export variant (e.g. prop 3915)
 )
 END_OF_FINDINGS = "Overall Result"
 SIGNATURES_MARKER = "Signatures"
@@ -309,8 +309,8 @@ def _extract_header_fields(rows: list[list], start: int, end: int, voff: int) ->
     value-row offset.
 
     Yardi cells often combine multiple labels in a single cell separated by \\n,
-    e.g. 'Property Code\\nUnit Code' with value '1949    \\n540-05  '. We split
-    both sides on \\n and pair them by position so 'Unit Code' resolves to '540-05'.
+    e.g. 'Property Code\\nUnit Code' with value '4820    \\n310-07  '. We split
+    both sides on \\n and pair them by position so 'Unit Code' resolves to '310-07'.
     """
     out: dict[str, str] = {}
     for ri in range(start, min(end, len(rows))):
@@ -580,16 +580,16 @@ def _build_property(units: list[Unit], path: Path) -> Property:
 
 
 def _property_name(path: Path) -> str:
-    """'Prop 4820 -540-550 E 64th St Inspection Analytics Report' ->
-    'Prop 4820 - 540-550 E 64th St'."""
+    """'Prop 4820 -1400-1410 Alderpath Ave Inspection Analytics Report' ->
+    'Prop 4820 - 1400-1410 Alderpath Ave'."""
     name = _REPORT_SUFFIX_RX.sub("", path.stem).strip()
-    name = re.sub(r"\s+-(?=\S)", " - ", name)  # ' -540' -> ' - 540'
+    name = re.sub(r"\s+-(?=\S)", " - ", name)  # ' -1400' -> ' - 1400'
     return name or path.stem
 
 
 # Unit-designator label words that belong to a single unit, not the building.
 # Once the unit number is stripped these would otherwise dangle, e.g.
-# '1725 Lemon Ave Apt 01 ...' -> '1725 Lemon Ave Apt ...'. "st"/"st." stays
+# '620 Larkmoor Ave Apt 01 ...' -> '620 Larkmoor Ave Apt ...'. "st"/"st." stays
 # out so street names ("1st St.") survive.
 _UNIT_LABEL_TOKENS = {"apt", "apt.", "apartment", "unit", "ste", "ste.", "suite", "#"}
 
@@ -608,7 +608,7 @@ def _property_address(unit_address: str, unit_number: str = "") -> str:
     if parts and parts[-1].lower() == "us":
         parts = parts[:-1]
 
-    # Remove the standalone unit-number token ('05' for unit '540-05', '#03', ...)
+    # Remove the standalone unit-number token ('07' for unit '310-07', '#03', ...)
     suffix = unit_number.split("-")[-1].strip() if unit_number else ""
     cleaned = []
     for tok in parts:
