@@ -53,17 +53,29 @@ def narrative_for(f: Finding) -> str:
     return f"{cat.capitalize()} flagged during inspection."
 
 
+def compose_bottom_line(unit_number: str, n: int, high: int) -> str:
+    """The deterministic closing line for a unit.
+
+    This is the floor the whole narrative layer falls back to, so it has to
+    read in the Steady Hand voice on its own: plain counts, no checklist tone,
+    no recommendation, nothing invented. The reviewer agent checks it against
+    the same rules as every other sentence."""
+    if n <= 0:
+        return ""
+    if high:
+        items = "item" if n == 1 else "items"
+        return f"Unit {unit_number} has {n} {items} noted from this inspection, {high} of them high priority."
+    if n == 1:
+        return f"Unit {unit_number} has one item noted from this inspection."
+    return f"Unit {unit_number} has {n} items noted from this inspection, none of them high priority."
+
+
 def bottom_line_for(unit: Unit) -> str:
     actionable = [f for f in unit.findings if f.action]
     if not actionable:
         return ""
     high = sum(1 for f in actionable if f.priority == "High")
-    n = len(actionable)
-    if high:
-        return f"{n} item{'s' if n > 1 else ''} flagged — {high} high priority."
-    if n == 1:
-        return "One item flagged for follow-up."
-    return f"{n} items flagged for follow-up."
+    return compose_bottom_line(unit.number, len(actionable), high)
 
 
 def populate(unit: Unit) -> Unit:
