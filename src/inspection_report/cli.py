@@ -17,6 +17,8 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.logging import RichHandler
 
+from .agents import DEFAULT_MAX_REVISIONS, DEFAULT_WORKERS
+
 load_dotenv()
 
 app = typer.Typer(
@@ -56,8 +58,15 @@ def build(
                                     help="Pre-written narratives JSON (from the Claude Code skill) — no API key needed"),
     manager: str = typer.Option("", "--manager", help="Property Manager name for the cover footer"),
     rps: str = typer.Option("", "--rps", help="Regional Property Supervisor name for the cover footer"),
+    orchestrate: bool = typer.Option(True, "--orchestrate/--no-orchestrate",
+                                     help="Run the multi-agent narrative layer (orchestrator, writer per unit, reviewer)"),
+    workers: int = typer.Option(DEFAULT_WORKERS, "--workers", min=1, max=16,
+                                help="How many units the orchestrator narrates in parallel"),
+    max_revisions: int = typer.Option(DEFAULT_MAX_REVISIONS, "--max-revisions", min=0, max=5,
+                                      help="How many times a writer may be sent back by the reviewer"),
 ) -> None:
     """Build a polished, owner-ready PDF from a Yardi inspection report."""
+    from .agents import Orchestrator
     from .pipeline import llm_narrative
     from .pipeline.narrative import apply_provided, populate
     from .render.builder import build_pdf
@@ -88,12 +97,35 @@ def build(
         if narratives:
             n_applied = apply_provided(prop, narratives)
             console.print(f"[bold blue]Narratives[/] applied {n_applied} pre-written narrative(s) from {narratives.name}")
-        if llm_narrative.is_available():
-            console.print(f"[bold blue]Generating narrative[/] via Claude ({llm_narrative.MODEL}) for any remaining findings")
-        elif not narratives:
-            console.print("[bold blue]Generating narrative[/] [dim](stub mode — use the Claude Code skill or set ANTHROPIC_API_KEY for Steady Hand voice)[/]")
-        for unit in prop.units:
-            populate(unit)
+        if orchestrate:
+            orch = Orchestrator(
+                use_claude=llm_narrative.is_available(),
+                workers=workers,
+                max_revisions=max_revisions,
+            )
+            mode = "reviewing pre-written narratives" if narratives else "writing narratives"
+            backend = "Claude" if orch.use_claude else "rules"
+            console.print(
+                f"[bold blue]Orchestrator[/] {mode} — {workers} writer agent(s) in parallel, "
+                f"reviewer on every sentence ({backend} backend)"
+            )
+            ledger = orch.review_only(prop) if narratives else orch.run(prop)
+            for unit in prop.units:
+                populate(unit)  # passed checklist items and any unit the agents skipped
+            ledger_path = orch.write_ledger(work_dir)
+            caught = ledger.issues_caught
+            detail = f"{caught} objection(s) raised, {ledger.repaired} unit(s) rewritten"
+            if ledger.escalated:
+                detail += f", [yellow]{ledger.escalated} escalated[/]"
+            console.print(f"[bold blue]Reviewer[/] {ledger.sentences_written} sentence(s) checked — {detail}")
+            console.print(f"  [dim]run ledger: {ledger_path}[/]")
+        else:
+            if llm_narrative.is_available():
+                console.print(f"[bold blue]Generating narrative[/] via Claude ({llm_narrative.MODEL}) for any remaining findings")
+            elif not narratives:
+                console.print("[bold blue]Generating narrative[/] [dim](stub mode — use the Claude Code skill or set ANTHROPIC_API_KEY for Steady Hand voice)[/]")
+            for unit in prop.units:
+                populate(unit)
 
         out_pdf = out / f"{_safe_filename(prop.name)}.pdf"
         console.print(f"[bold blue]Rendering[/] {out_pdf}")
@@ -268,6 +300,77 @@ def check(
             console.print(f"[red]FAIL[/] {f}")
         raise typer.Exit(code=1)
     console.print("[bold green]All gates passed[/]")
+
+
+@app.command()
+def review(
+    input: Path = typer.Argument(..., exists=True, readable=True, help="The Yardi file the narratives were written from"),
+    narratives: Path = typer.Option(..., "--narratives", "-n", exists=True, readable=True,
+                                    help="Narratives JSON to review"),
+    fix: bool = typer.Option(False, "--fix", help="Let the writer agent repair what the reviewer rejects"),
+) -> None:
+    """Run the reviewer agent over narratives without building a PDF.
+
+    This is the loop the orchestrator runs per unit, exposed on its own so you
+    can see exactly what the reviewer objects to and why. Exits non-zero if
+    anything is still rejected.
+    """
+    from .agents import Orchestrator
+    from .pipeline import llm_narrative
+    from .pipeline.narrative import apply_provided
+
+    parse_fn = _parser_for(input)
+    work = Path("outputs/.work") / f"review-{input.stem}"
+    prop = parse_fn(input, media_out_dir=work / "raw_photos")
+    applied = apply_provided(prop, narratives)
+    console.print(f"[bold blue]Reviewing[/] {applied} narrative(s) from {narratives.name}")
+
+    orch = Orchestrator(use_claude=llm_narrative.is_available(),
+                        max_revisions=2 if fix else 0)
+    ledger = orch.review_only(prop) if fix else _review_pass(orch, prop)
+
+    rejected = 0
+    for rec in ledger.units:
+        problems = rec.issues_remaining or rec.issues_raised
+        if not problems:
+            continue
+        rejected += len(problems)
+        console.print(f"\n[yellow]Unit {rec.unit_number}[/] — {len(problems)} objection(s)")
+        for issue in problems:
+            where = "bottom line" if issue["index"] == -1 else f"finding {issue['index']}"
+            console.print(f"  [red]{issue['rule']}[/] {where}: {issue['detail']}")
+
+    console.print(f"\n[bold]{ledger.sentences_written}[/] sentence(s) reviewed across {len(ledger.units)} unit(s)")
+    if fix:
+        console.print(f"{ledger.repaired} unit(s) repaired, {ledger.escalated} escalated")
+    if rejected and not fix:
+        console.print(f"[red]{rejected} objection(s)[/] — rerun with --fix to have the writer agent repair them")
+        raise typer.Exit(code=1)
+    if ledger.escalated:
+        raise typer.Exit(code=1)
+    console.print("[bold green]Every sentence passed the reviewer[/]")
+
+
+def _review_pass(orch, prop):
+    """Review with no repair, so the output shows what the reviewer actually saw."""
+    from .agents.orchestrator import _result_from_unit, _task_for
+    from .agents.protocol import UnitRecord
+
+    for unit in prop.units:
+        task = _task_for(unit)
+        if not task.findings:
+            continue
+        existing = _result_from_unit(unit, task)
+        result = orch.reviewer.review(task.findings, existing)
+        orch.ledger.units.append(UnitRecord(
+            unit_number=unit.number,
+            attempts=1,
+            reviewer_backend=orch.reviewer.backend,
+            findings_written=len(existing.sentences),
+            issues_raised=[vars(i) for i in result.issues],
+        ))
+    orch.ledger.units.sort(key=lambda r: r.unit_number)
+    return orch.ledger
 
 
 @app.command()
