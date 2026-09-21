@@ -28,6 +28,39 @@ That is enforced, not suggested. The narrative writer is forbidden from using *s
 
 So the tool converts a note like *"Carpet in bedrooms are old and damaged. Need to be replaced with hardwood floor"* into a statement of condition, dropping the technician's implied fix. That is the whole design constraint in one example.
 
+## The narrative layer is a small agent system
+
+The writing used to happen in one pass. Every finding in the report went to one model call, and the only thing standing between a bad sentence and an owner's inbox was the QA gate at the very end. By the time that gate fired, the sentence had already been written, rendered and paginated, and the only fix was a full rebuild.
+
+So the narrative step is now three roles instead of one.
+
+**The orchestrator** (`agents/orchestrator.py`) fans the work out by unit. The unit is the natural boundary, because a unit's findings share a tenant, a walk-through and a closing line. Units are narrated in parallel; `--workers` sets how many at once.
+
+**A writer agent per unit** (`agents/writer.py`) turns each technician note into one short sentence of fact and assigns a priority.
+
+**A reviewer agent** (`agents/reviewer.py`) reads every sentence the writer produced, against the source note, before anything is rendered. It objects on five grounds: a recommended fix, language implying work has started, off-voice phrasing, a priority that does not match what was found, and **grounding**, meaning any number in the sentence that appears nowhere in the technician's note. That last one is the objection that matters most, because a sentence that invents a fact about someone's property is worse than a clumsy one.
+
+When the reviewer objects, that unit goes back to its writer with the objections attached, and only the rejected sentences are rewritten. Clean sentences come back byte-identical. A unit that still has objections after the last attempt drops to a deterministic floor that validates itself against the reviewer's own rules before it returns anything.
+
+```bash
+inspection-report review <file> --narratives narratives.json         # what does the reviewer object to?
+inspection-report review <file> --narratives narratives.json --fix   # let the writer repair it
+inspection-report build <file> --workers 8 --max-revisions 2
+inspection-report build <file> --no-orchestrate                      # the old single-pass path
+```
+
+Every build writes a ledger to `outputs/.work/<name>/agent_run.json`: attempts, objections and outcome for each unit. On the shipped sample, building from scratch with no pre-written narratives raises one objection, on a sentence that restated the Yardi action word instead of describing the condition, and the writer clears it on the second attempt.
+
+**Both agents run with or without an API key.** Each has two backends behind one contract: a Claude call with its own system prompt when `ANTHROPIC_API_KEY` is set, and a deterministic rules engine otherwise. The reviewer's model pass is additive only, so it can add an objection but never clear one the rules raised. An API outage cannot lower the bar; it only makes the writing plainer.
+
+The six QA gates in `inspection-report check` are unchanged. They are no longer the only thing catching a bad sentence, which is what they were never good at. They are the second line.
+
+`pytest` covers the layer with no API key: adversarial sentences for each rule, a check that every repair clears the objection it was raised for, and a check that eight parallel workers produce the same report as one.
+
+```bash
+.venv/bin/python -m pytest tests/ -q
+```
+
 ## How it works
 
 ```
@@ -35,7 +68,7 @@ xlsx / pdf export
    ↓  parsers/          pull inspections, findings, embedded photos
    ↓  pipeline/photos   extract, downscale, recompress
    ↓  pipeline/charts   matplotlib, brand palette
-   ↓  pipeline/narrative rewrite each note; assign High / Medium / Low
+   ↓  agents/           orchestrator, a writer agent per unit, a reviewer on every sentence
    ↓  render/           Jinja templates + CSS, printed by headless Chromium
    ↓  qa                size, structure, disclaimer, unit coverage, language gates
 PDF
@@ -60,6 +93,7 @@ Other commands:
 inspection-report extract <file>    # dump findings JSON
 inspection-report discover <file>   # parse and print, no render
 inspection-report check <pdf>       # run the QA gates
+inspection-report review <file> -n narratives.json   # reviewer agent only, no render
 ```
 
 The narratives behind `docs/example-report.pdf` ship alongside the sample, so the exact example rebuilds without a session:
@@ -75,10 +109,12 @@ The narratives behind `docs/example-report.pdf` ship alongside the sample, so th
 src/inspection_report/
   parsers/     xlsx and pdf ingestion
   pipeline/    photos, charts, narrative, priority
+  agents/      orchestrator, writer agent, reviewer agent
   render/      Jinja templates, CSS, Chromium
 .claude/skills/ the build-inspection-report skill
 assets/        fonts, logo, inspector roster
 sample-data/   synthetic export, safe to run
+tests/         the agent layer, no API key needed
 ```
 
 ## A note on the data

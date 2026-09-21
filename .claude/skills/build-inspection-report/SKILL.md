@@ -68,7 +68,7 @@ Fernwater's report states **what the inspection found** — it does not suggest,
 - The only past action you may state is something the technician genuinely completed **on-site during the inspection** ("the technician replaced the battery on site").
 - No filler, no alarm, no casual phrasing ("looks pretty bad"), no checklist tone ("Item flagged. Repair required.").
 
-`inspection-report check` enforces this: a build whose text contains recommendation phrasing (should / recommend / needs to be / advised) or started-work phrasing **fails** the QA gates.
+Two things enforce this. The reviewer agent checks each sentence as it is written, and `inspection-report check` re-checks the finished PDF: a build whose text contains recommendation phrasing (should / recommend / needs to be / advised) or started-work phrasing **fails** the QA gates.
 
 To omit a finding entirely (e.g. a duplicate or one with no real detail), add `"omit": true` to its finding entry instead of a narrative.
 
@@ -77,6 +77,18 @@ To omit a finding entirely (e.g. a duplicate or one with no real detail), add `"
 - **High** — life-safety or active damage: missing/non-working smoke or CO alarms, active leaks, mold, exposed electrical, gas, structural, broken exterior locks, anything posing shock/fall/fire risk, hoarding that blocks exits.
 - **Medium** — schedule this quarter: end-of-life appliances/fixtures, deterioration that escalates if ignored, broken-but-not-urgent items. Default for action "Replace" unless obviously cosmetic.
 - **Low** — cosmetic, low-cost preventive, or already fixed on site.
+
+## Step 2b — The reviewer reads your sentences
+
+Your narratives do not go straight to the renderer. `build` runs them through the reviewer agent first, and anything it rejects goes to a writer agent to be repaired. You can see what it objects to before you build:
+
+```powershell
+.\.venv\Scripts\inspection-report.exe review "<path-to-yardi-file>" --narratives "outputs\.work\<name>\narratives.json"
+```
+
+It exits non-zero and lists each objection by unit and finding index. Fix them in your JSON rather than letting the repair path rewrite your sentence, because the repair is deliberately blunt: it cuts the offending clause and falls back to the technician's note. Your sentence is better.
+
+The reviewer objects on five grounds: a recommended fix, language implying work has started, off-voice phrasing, a priority that does not match what was found, and grounding, meaning any number in your sentence that appears nowhere in the source note. That last one is the one to watch. Do not write a capacity, a measurement, a room or a date the technician did not record.
 
 ## Step 3 — Build
 
@@ -89,6 +101,7 @@ Must report `Done ... OK` and under 15 MB. If over 15 MB, rebuild with `--qualit
 ## Step 4 — Verify and deliver
 
 1. `.\.venv\Scripts\inspection-report.exe check "outputs\<output>.pdf"`
+1. Read `outputs\.work\<name>\agent_run.json`. Any unit with `"outcome": "escalated"` had a sentence the writer could not repair, and it is now sitting on the deterministic floor. Rewrite those by hand.
 2. Spot-check by rendering 2–3 pages to PNG (PyMuPDF, the venv has it) and confirm: cover KPIs + Manager/RPS filled, unit pages show findings + photos, narratives read as plain facts (no recommendations), disclaimer present on the final page.
 3. Open the PDF for the user (`Invoke-Item`) and summarize: units, findings, not-inspected units with reasons, file size.
 
